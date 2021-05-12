@@ -2,63 +2,43 @@ var arrayPalabras4 = [];
 var arrayPalabras6 = [];
 var casillas = [];
 var valorCasillas = [];
-var filasErroneas = [];
 var letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 var guardarDatos = false;
 var pistas = 3;
 var infoPasatiempo = {'valores': '', 'pistas': ''};
-var soluciones = {'0': 'clan', '5':'pena', '6':'remato', '11':'torero'};
 var colores = {'verde':'#A7F270', 'rojo':'#E66852'};
 
-var tablero = [
-    [" "," "," "," "," "," "," "," "," "],
-    [" "," ","I","I","I","I","1"," "," "],
-    [" "," ","I","I","I","I"," "," "," "],
-    [" "," ","I","I","I","I"," "," "," "],
-    [" "," ","I","I","I","I"," "," "," "],
-    [" "," ","I","I","I","I"," "," "," "],
-    [" "," ","I","I","I","I","2"," "," "],
-    [" ","3","I","I","I","I","I","I"," "],
-    [" "," ","I","I","I","I","I","I"," "],
-    [" "," ","I","I","I","I","I","I"," "],
-    [" "," ","I","I","I","I","I","I"," "],
-    [" "," ","I","I","I","I","I","I"," "],
-    [" ","4","I","I","I","I","I","I"," "],
-    [" "," "," "," "," "," "," "," "," "]
-];
-var origenes = [1,2];
+var tablero;
+var origen;
+
+function cargarDatosPasatiempo(){
+    this.tablero = [
+        [" "," "," "," "," "," "," "," "," "],
+        [" "," ","I","I","I","I","1"," "," "],
+        [" "," ","I","I","I","I"," "," "," "],
+        [" "," ","I","I","I","I"," "," "," "],
+        [" "," ","I","I","I","I"," "," "," "],
+        [" "," ","I","I","I","I"," "," "," "],
+        [" "," ","I","I","I","I","2"," "," "],
+        [" ","3","I","I","I","I","I","I"," "],
+        [" "," ","I","I","I","I","I","I"," "],
+        [" "," ","I","I","I","I","I","I"," "],
+        [" "," ","I","I","I","I","I","I"," "],
+        [" "," ","I","I","I","I","I","I"," "],
+        [" ","4","I","I","I","I","I","I"," "],
+        [" "," "," "," "," "," "," "," "," "]
+    ];
+    this.origen = [1,2];
+    $.post("http://localhost:8000/data", {valor:"jajajaja"}, function(result){
+        console.log(result);
+    });
+}
 
 const removeAccents = (str) => {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-} 
+}
 
 /*FUNCIONES DE LA CARGA DEL DICCIONARIO Y ESTRUCTURAS DE DATOS INICIALES */
-
-function cargarDiccionario(){
-    let url = "https://ordenalfabetix.unileon.es/aw/diccionario.txt";
-    //let url = "https://diccionario.casasoladerueda.es/diccionario.txt";
-    fetch(url)
-        .then(response => response.text())
-        .then((response) => {
-            almacenarPalabras(response);
-        })
-        .catch(function(){
-            e => console.log(`Error :  ${e}`)
-        });
-}
-
-function almacenarPalabras(texto){
-    let palabras = texto.split("\n");
-    palabras.forEach(function(elemento, _indice, _array) {
-        if(elemento.length == 4){
-            arrayPalabras4.push(removeAccents(elemento));
-        }else if(elemento.length == 6){
-            arrayPalabras6.push(removeAccents(elemento));
-        }
-    });
-    document.getElementById("botonResolver").disabled = false;
-    document.getElementById("botonResolver").enabled = true;
-}
 
 function cargarInfoGuardada(){
     inicializarValorCasillas();
@@ -79,6 +59,9 @@ function cargarInfoGuardada(){
     } else {
         alert("Sorry, your browser does not support Web Storage...");
     }
+    //poner la comprobacion de que el server ya ha cargado la info del diccionario
+    document.getElementById("botonResolver").disabled = false;
+    document.getElementById("botonResolver").enabled = true;
 }
 
 function cargarValoresCasillas(valores){
@@ -86,7 +69,7 @@ function cargarValoresCasillas(valores){
     for(let i=0; i<tablero.length; i++){
         for(let j=0; j<tablero[0].length; j++){
             if(tablero[i][j] == "I"){
-                let coordenadas = [i-origenes[0], j-origenes[1]];
+                let coordenadas = [i-origen[0], j-origen[1]];
                 casillas[coordenadas[0]][coordenadas[1]].value = valorCasillas[coordenadas[0]][coordenadas[1]];
             }
         }
@@ -102,7 +85,7 @@ function inicializarValorCasillas(){
                 fila.push("");
             }
         }
-        valorCasillas.push(fila);
+        if(fila.length != 0) valorCasillas.push(fila);
     }
 }
 
@@ -166,7 +149,7 @@ function guardarValorCasillas(){
     for(let i=0; i<tablero.length; i++){
         for(let j=0; j<tablero[0].length; j++){
             if(tablero[i][j] == "I"){
-                let coordenadas = [i-origenes[0], j-origenes[1]];
+                let coordenadas = [i-origen[0], j-origen[1]];
                 valorCasillas[coordenadas[0]][coordenadas[1]] = casillas[coordenadas[0]][coordenadas[1]].value;
             }
         }
@@ -244,106 +227,15 @@ function eliminarCaracter(palabra, car){
 /*FUNCIONES DE RESOLUCIÓN DEL TABLERO */
 
 function resolverPasatiempo(){
-    let palabra = "";
-    let anterior = null;
-    filasErroneas = [];
-    var error = false;
-
-    valorCasillas.forEach(function(elemento, indice, _array){
-        elemento.forEach(function(elemento, _indice, _array){
-            palabra += elemento;
-        });
-        if(indice<6){
-            if(error & indice!=5){
-                if(indice == 4) error = false;
-                filasErroneas.push(indice);
-            }else{
-                if(!validarFila(palabra,indice,anterior)){
-                    filasErroneas.push(indice);
-                    error = true;
-                }
-            }
-        }else{
-            if(error & indice != 11){
-                if(indice == 10) error = false;
-                filasErroneas.push(indice);
-            }else{
-                if(!validarFila(palabra,indice,anterior)){
-                    filasErroneas.push(indice);
-                    error = true;
-                }
-            }
-        }
-        anterior = palabra;
-        palabra = "";
+    console.log(this.valorCasillas);
+    $.post("http://localhost:8000/server.js", {valorCasillas: this.valorCasillas}, function(result){
+        console.log('FIN COMPROBACIÓN');
+        console.log(result);
+        corregirTablero(result);
     });
-    corregirTablero();
 }
 
-function validarFila(palabra, indice, anterior){
-    let solucion = null;
-    palabra = palabra.toLowerCase();
-    let resultado;
-    if(soluciones.hasOwnProperty(indice)){
-        solucion = soluciones[indice];
-        return solucion==palabra?true:false;
-    }else{
-        if(existe(palabra)){
-            resultado = validarCambio(palabra,anterior,indice)?true:false;
-        }else{
-            resultado = false;
-        }
-    }
-    if(resultado & (indice == 4 | indice == 10)){
-        resultado = validarCambio(soluciones[indice+1],palabra,indice+1);
-    }
-    return resultado;
-}
-
-function existe(palabra){
-    if(palabra.length == 4){
-        return arrayPalabras4.includes(palabra);
-    }else if(palabra.length == 6){
-        return arrayPalabras6.includes(palabra);
-    }else{
-        return false;
-    }
-}
-
-function validarCambio(palabra, anterior, indice){
-    anterior = anterior.toLowerCase();
-    var longitud = palabra.length;
-    let palabraMod, todasLetras, ant, numCoincidencias = 0;
-    if(indice%2==1){ //cambio letra
-        for(var i=0; i<longitud; i++){
-            ant = anterior;
-            palabraMod = eliminarCaracter(palabra, palabra.charAt(i));
-            todasLetras = true
-            for(var j=0; j<longitud-1; j++){
-                if(!ant.includes(palabraMod[j])){
-                    todasLetras = false;
-                }else{
-                    ant = eliminarCaracter(ant, palabraMod[j]);
-                }
-            }
-            if(todasLetras) numCoincidencias++;
-        }
-        todasLetras = numCoincidencias>0 & numCoincidencias<longitud?true:false; //PARA COMPROBAR QUE NO HAN COINCIDIDO EN TODAS LAS LETRAS
-                                                                   //DE SER ASÍ, SE TRATARIA DE LA MISMA PALABRA, Y ES ALGO QUE NO QUEREMOS
-    }else{ //cambio orden
-        todasLetras = true
-        for(var i=0; i<longitud && todasLetras; i++){
-            if(!anterior.includes(palabra[i])){
-                todasLetras = false;
-            }else{
-                anterior = eliminarCaracter(anterior, palabra[i]);
-            }
-        }
-    }
-    return todasLetras;   
-}
-
-function corregirTablero(){
+function corregirTablero(filasErroneas){
     casillas.forEach(function(elemento, indice, _array){
         var funcion = pintarVerde;
         if(filasErroneas.includes(indice))
@@ -376,7 +268,7 @@ function crearTabla(){
             if(valor == " "){
                 columna = createEmptyColumn();
             }else if(valor == "I"){
-                let indices = [i-origenes[0], j-origenes[1]];
+                let indices = [i-origen[0], j-origen[1]];
                 let coordenadas = "celda"+letras[indices[0]]+indices[1];
                 celda = createInputCell(coordenadas,indices);
                 columna = createInputColumn(celda);
