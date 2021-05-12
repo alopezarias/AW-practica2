@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EN CASCADA</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="styles.css">
+        <script type="text/javascript" src="script.js"></script>
+    </head>
+
+    <body class="pagina" onload="cargarDiccionario(),crearTabla(),cargarInfoGuardada()">
+        <header class="color1">
+            <h1 class="titulo">EN CASCADA</h1>
+        </header>
+        <nav id="barra" class="color1">
+            <button id="botonResolver" type="button" onclick="resolverPasatiempo()" disabled>Resolver</button>
+        </nav>
+        <section>
+            <article id="tablero" class="color2">
+                <form>
+                    <table id="tabla">
+                        <th colspan="9">Tablero del Pasatiempo</th>
+                    </table>
+                </form>
+            </article>
+            <article id="instrucciones" class="color3">
+                <article id="datos" class="color4">
+                    <h4>Información de resolución</h4>
+                    <ol>
+                        <li>Familia en Escocia.</li>
+                        <li>Tristeza y dolor por algo.</li>
+                        <li>Termino algo definitivamente.</li>
+                        <li>El que torea.</li>
+                    </ol>
+                    <h4>Instrucciones del pasatiempo</h4>
+                    <p>Identifique la primera palabra y la última de cada bloque con las pistas que se dan.
+                        A continuación, trate de descrubir las palabras intermedias. Para lograrlo,
+                        cambie una letra de la primera palabra para obtener la próxima y, después, altere
+                        el orden de una o varias letras para encontrar la siguiente. Siga así, sucesivamente,
+                        hasta que logre completar ambos casilleros. Todas las palabras intermedias deben
+                        tener significado.
+                    </p>
+                </article>
+                <article id="seccionPista" class="color5">
+                    <form>
+                        <table id="tablaPista">
+                            <tr>
+                                <td rowspan="3" colspan="2" id="textoPista">
+                                    <h4>Pistas de resolución</h4>
+                                    <p>Introduce letras y obtendrás palabras formadas con ellas. Úsame con precaución, 
+                                        solo tienes 3 oportunidades.</p>
+                                </td>
+                                <td colspan="1" id="formularioPista">
+                                    <input id="letrasPista" type="text" size="6" maxlength="6"/>
+                                </td>
+                                <td colspan="1" id="casillaBotonPista">
+                                    <button id="botonPista" type="button" onclick="otorgarPista()">Pedir Pista (3)</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" id="casillaPista">
+                                    <textarea id="pista" rows="5" cols="7" readonly></textarea>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </article>
+            </article>
+        </section>
+        <footer class="color6">
+            <table class="tabla_toggle">
+                <tr>
+                    <td>
+                        <h5>Pasatiempo en Cascada - Ángel López Arias   |   </h5>
+                    </td>
+                    <td>
+                        <h5>Guardar progreso</h5>
+                    </td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" id="guardar" onchange="cambioAlmacenamiento()"> 
+                            <span class="slider round"></span>
+                        </label>
+                    </td>
+                    <td>
+                        <h5>   |   2021</h5>
+                    </td>
+                </tr>
+            </table>
+        </footer>
+    </body>
+</html>
