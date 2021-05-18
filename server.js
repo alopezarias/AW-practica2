@@ -202,9 +202,32 @@ function cargarDatosJuego(){
     data = json;
 }
 
-/*function otorgarPista(letras){
+function otorgarPista(letras){
+    var palabras = [];
+    var palabra = "";
+    var coincide;
 
-}*/
+    longitudes.forEach(function(tamanio, index, _array){
+        arrayPalabrasDiccionario[tamanio].forEach(function(elemento, _indice, _array){
+            coincide = true;
+            palabra = elemento;
+            for(var i=0; i<letras.length; i++){
+                if(coincide && !palabra.includes(letras[i])){
+                    coincide = false;
+                }else{
+                    palabra = eliminarCaracter(palabra,letras[i]);
+                }
+            }
+            if(coincide) palabras.push(elemento);        
+        });
+        
+    });
+    var texto = "";
+    palabras.forEach(function(elemento, indice, array){
+        texto += elemento + "\t";
+    });
+    return texto;
+}
 
 //#######################################################################//
 //#######################################################################//
@@ -259,13 +282,13 @@ app.post('/data', function(request, response){
 });
 
 
-//TODO, problemas del futuro
+//TODO
 // POST -> Otorgar pistas al navegador
-/*app.post('/clue', function(request, response){
-    const received = request.body.vector;
-    let arrayPistas = otorgarPista(received);
+app.post('/clue', function(request, response){
+    const letras = request.body.letras;
+    let arrayPistas = otorgarPista(letras);
     response.send(arrayPistas);
-});*/
+});
 
 app.listen(port, () => {
     cargarDatosJuego();

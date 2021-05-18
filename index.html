@@ -8,14 +8,21 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
 
-    <body class="pagina" onload="cargarDatosPasatiempo()">
+    <body class="pagina" onload="eleccionPasatiempo()">
         <header class="color1">
             <h1 class="titulo">EN CASCADA</h1>
         </header>
         <nav id="barra" class="color1">
             <button id="botonResolver" type="button" onclick="resolverPasatiempo()" disabled>Resolver</button>
         </nav>
-        <section>
+        <section id="section_eleccion">
+            <article id="pasatiempos" class="color2">
+                <button class="pasatiempo" type="button" onclick="cargarDatosPasatiempo('uno')">INICIAL</button>
+                <button class="pasatiempo" type="button" onclick="cargarDatosPasatiempo('dos')">MEDIO</button>
+                <button class="pasatiempo" type="button" onclick="cargarDatosPasatiempo('tres')">EXPERTO</button>       
+            </article>
+        </section>
+        <section id="section">
             <article id="tablero" class="color2">
                 <form>
                     <table id="tabla">

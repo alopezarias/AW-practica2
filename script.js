@@ -10,13 +10,29 @@ var tablero;
 var origen;
 var longitudes;
 
-function cargarDatosPasatiempo(){
-    let id_pasatiempo = "uno";
+var elements = [];
+var id;
+
+function eleccionPasatiempo(){
+    elements[0] = document.getElementById("section");
+    elements[1] = document.getElementById("barra");
+    elements[2] = document.getElementById("section_eleccion");
+    elements[0].style.display = "none";
+    elements[1].style.display = "none";
+    elements[2].style.display = "block";
+}
+
+function cargarDatosPasatiempo(id_pasatiempo){
+    id = id_pasatiempo;
+    elements[0].style.display = "flex";
+    elements[1].style.display = "block";
+    elements[2].style.display = "none";
+    //let id_pasatiempo = "uno";
     $.post("http://localhost:8000/data", {id: id_pasatiempo}, function(result){    
         //console.log(result);
         cargarPistas(result.infoPalabras);
         setearValores(result);
-        setearTablero.then(crearTabla(), cargarInfoGuardada());
+        setearTablero.then(crearTabla(), cargarInfoGuardada(id_pasatiempo));
         //metodo para setear el tablero, las pistas y el origen de coordenadas
     });
 }
@@ -27,10 +43,10 @@ const removeAccents = (str) => {
 
 /*FUNCIONES DE LA CARGA DEL DICCIONARIO Y ESTRUCTURAS DE DATOS INICIALES */
 
-function cargarInfoGuardada(){
+function cargarInfoGuardada(id){
     inicializarValorCasillas();
     if (typeof(Storage) !== "undefined") {
-        let info = localStorage.getItem("pasatiempo");
+        let info = localStorage.getItem("pasatiempo_" + id);
         if(info !== null){
             infoPasatiempo = JSON.parse(info);
             document.getElementById("guardar").checked = true;
@@ -86,7 +102,7 @@ function cambioAlmacenamiento(){
         alert("SE GUARDARÁ EL PROGRESO");
         guardarTodoEnMemoria();
     }else{
-        localStorage.removeItem("pasatiempo");
+        localStorage.removeItem("pasatiempo_" + id);
         alert("EL PROGRESO NO SE GUARDARÁ");
     }
 }
@@ -96,7 +112,7 @@ function guardarTodoEnMemoria(){
     infoPasatiempo.valores = valorCasillas;
     infoPasatiempo.pistas = pistas;
     if (typeof(Storage) !== "undefined") {
-        localStorage.setItem("pasatiempo", JSON.stringify(infoPasatiempo));
+        localStorage.setItem("pasatiempo_" + id, JSON.stringify(infoPasatiempo));
     } else {
         alert("Sorry, your browser does not support Web Storage...");
     }
@@ -105,7 +121,7 @@ function guardarTodoEnMemoria(){
 function guardarCasillasEnMemoria(){
     infoPasatiempo.valores = valorCasillas;
     if (typeof(Storage) !== "undefined") {
-        localStorage.setItem("pasatiempo", JSON.stringify(infoPasatiempo));
+        localStorage.setItem("pasatiempo_" + id, JSON.stringify(infoPasatiempo));
     } else {
         alert("Sorry, your browser does not support Web Storage...");
     }
@@ -114,7 +130,7 @@ function guardarCasillasEnMemoria(){
 function guardarPistasEnMemoria(){
     infoPasatiempo.pistas = pistas;
     if (typeof(Storage) !== "undefined") {
-        localStorage.setItem("pasatiempo", JSON.stringify(infoPasatiempo));
+        localStorage.setItem("pasatiempo_" + id, JSON.stringify(infoPasatiempo));
     } else {
         alert("Sorry, your browser does not support Web Storage...");
     }
@@ -146,49 +162,23 @@ function guardarValorCasillas(){
 
 /*FUNCIONES DE PISTAS DE PALABRAS*/
 
-/*function otorgarPista(){
+function otorgarPista(){
     if(pistas>0){
         var letras = document.getElementById("letrasPista").value.toLowerCase();
-        //letras = letras.toLowerCase();
-        var palabras = [];
-        var palabra = "";
-        var coincide;
-
-        arrayPalabras4.forEach(function(elemento, _indice, _array){
-            coincide = true;
-            palabra = elemento;
-            for(var i=0; i<letras.length; i++){
-                if(coincide && !palabra.includes(letras[i])){
-                    coincide = false;
-                }else{
-                    palabra = eliminarCaracter(palabra,letras[i]);
-                }
-            }
-            if(coincide) palabras.push(elemento);        
+        $.post("http://localhost:8000/clue", {letras: letras}, function(result){
+            console.log('FIN PISTAS');
+            mostrarPistas(result);
         });
-        arrayPalabras6.forEach(function(elemento, indice, array){
-            coincide = true;
-            palabra = elemento;
-            for(var i=0; i<letras.length; i++){
-                if(coincide && !palabra.includes(letras[i])){
-                    coincide = false;
-                }else{
-                    palabra = eliminarCaracter(palabra,letras[i]);
-                }
-            }
-            if(coincide) palabras.push(elemento);
-        });
-        var texto = "";
-        palabras.forEach(function(elemento, indice, array){
-            texto += elemento + "\t";
-        });
-        document.getElementById("pista").value = texto;
-        this.pistas--;
-        actualizarPistas();
     }else{
         alert("NO HAY MÁS PISTAS DISPONIBLES");
     }
-    guardarPistasEnMemoria();
+}
+
+function mostrarPistas(texto){
+        document.getElementById("pista").value = texto;
+        pistas--;
+        actualizarPistas();
+        guardarPistasEnMemoria();
 }
 
 function actualizarPistas(){
@@ -200,7 +190,7 @@ function actualizarPistas(){
         document.getElementById("botonPista").enabled = false;
         document.getElementById("botonPista").disabled = true;
     }
-}*/
+}
 
 function eliminarCaracter(palabra, car){
     let final = "";

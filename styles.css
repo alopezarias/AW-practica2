@@ -55,6 +55,12 @@ footer{
   width:100%;
   padding:6px;
 }
+#pasatiempos{
+  text-align: center;
+  background-color: var(--color4);
+  width:(100%)-6px;
+  padding:6px;
+}
 #datos{
   background-color: var(--color1);
   width:(100%)-6px;
@@ -250,4 +256,25 @@ input:checked + .slider:before {
 .tabla_toggle{
   display:flex;
   justify-content:center;
+}
+
+/*pasatiempos elecciones*/
+.pasatiempo{
+  transition-duration: 0.2s;
+  background-color: var(--color1);
+  border: 2px solid var(--color2);
+  padding: 150px 100px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 25px;
+  margin: 4px 2px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--fuente);
+  font-weight: 900;
+}
+.pasatiempo:hover{
+  background-color: var(--color5);
+  color: white;
 }
