@@ -3,83 +3,9 @@
 //                              DATOS                                    //
 //#######################################################################//
 //#######################################################################//
-var longitudes = [4, 6];
+var data;
 var arrayPalabrasDiccionario = {};
-var tableros = {
-    '1': [
-        [" "," "," "," "," "," "," "," "," "],
-        [" "," ","I","I","I","I","1"," "," "],
-        [" "," ","I","I","I","I","1"," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I","2"," "," "],
-        [" ","3","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" ","4","I","I","I","I","I","I"," "],
-        [" "," "," "," "," "," "," "," "," "]
-    ],
-    '2': [
-        [" "," "," "," "," "," "," "," "," "],
-        [" "," ","I","I","I","I","1"," "," "],
-        [" "," ","I","I","I","I","2"," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I","2"," "," "],
-        [" ","3","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" ","4","I","I","I","I","I","I"," "],
-        [" "," "," "," "," "," "," "," "," "]
-    ],'3': [
-        [" "," "," "," "," "," "," "," "," "],
-        [" "," ","I","I","I","I","1"," "," "],
-        [" "," ","I","I","I","I","3"," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I","2"," "," "],
-        [" ","3","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" ","4","I","I","I","I","I","I"," "],
-        [" "," "," "," "," "," "," "," "," "]
-    ] 
-};
-var origenes = {
-    '1': [1,2],
-    '2': [1,2],
-    '3': [1,2]
-};
-var soluciones = {
-    '1': {
-        '0': 'clan',
-        '5':'pena',
-        '6':'remato',
-        '11':'torero'
-    },
-    '2': {
-        '0': 'clan',
-        '5':'pena',
-        '6':'remato',
-        '11':'torero'
-    },
-    '3': {
-        '0': 'clan',
-        '5':'pena',
-        '6':'remato',
-        '11':'torero'
-    }
-}
-var solucionFijas = soluciones['1'];
+var tablero, longitudes, soluciones, origen;
 
 //#######################################################################//
 //#######################################################################//
@@ -133,30 +59,20 @@ function resolverTablero(data){
     let anterior = null;
     filasErroneas = [];
     var error = false;
+    let key;
 
     data.forEach(function(elemento, indice, _array){
         elemento.forEach(function(elemento, _indice, _array){
             palabra += elemento;
         });
-        if(indice<6){
-            if(error & indice!=5){
-                if(indice == 4) error = false;
-                filasErroneas.push(indice);
-            }else{
-                if(!validarFila(palabra,indice,anterior)){
-                    filasErroneas.push(indice);
-                    error = true;
-                }
-            }
+        key = ""+(indice+1)+"";
+        if(error){
+            if(key in soluciones) error = false;
+            filasErroneas.push(indice);
         }else{
-            if(error & indice != 11){
-                if(indice == 10) error = false;
+            if(!validarFila(palabra,indice,anterior)){
                 filasErroneas.push(indice);
-            }else{
-                if(!validarFila(palabra,indice,anterior)){
-                    filasErroneas.push(indice);
-                    error = true;
-                }
+                error = true;
             }
         }
         anterior = palabra;
@@ -169,8 +85,8 @@ function validarFila(palabra, indice, anterior){
     let solucion = null;
     palabra = palabra.toLowerCase();
     let resultado;
-    if(solucionFijas.hasOwnProperty(indice)){
-        solucion = solucionFijas[indice];
+    if(soluciones.hasOwnProperty(indice)){
+        solucion = soluciones[indice];
         return solucion==palabra?true:false;
     }else{
         if(existe(palabra)){
@@ -180,16 +96,16 @@ function validarFila(palabra, indice, anterior){
         }
     }
     if(resultado & (indice == 4 | indice == 10)){
-        resultado = validarCambio(solucionFijas[indice+1],palabra,indice+1);
+        resultado = validarCambio(soluciones[indice+1],palabra,indice+1);
     }
     return resultado;
 }
 
 function existe(palabra){
-    if(palabra.length == 4){
-        return arrayPalabrasDiccionario['4'].includes(palabra);
-    }else if(palabra.length == 6){
-        return arrayPalabrasDiccionario['6'].includes(palabra);
+    if(palabra.length == longitudes[0]){
+        return arrayPalabrasDiccionario[longitudes[0]].includes(palabra);
+    }else if(palabra.length == longitudes[1]){
+        return arrayPalabrasDiccionario[longitudes[1]].includes(palabra);
     }else{
         return false;
     }
@@ -238,6 +154,33 @@ function eliminarCaracter(palabra, car){
     return final;
 }
 
+function getBasicParameters(id){
+    let parametros = {'tablero': '',
+                      'origen': '',
+                      'infoPalabras': '',
+                      'longitudes' : ''}
+    parametros.tablero = data.tableros[id];
+    tablero = data.tableros[id];
+    parametros.origen = data.origenes[id];
+    origen = data.origenes[id];
+    parametros.infoPalabras = data.info_palabras_fijas[id];
+    parametros.longitudes = data.longitudes[id];
+    longitudes = data.longitudes[id];
+    console.log(parametros);
+    return parametros;
+}
+
+function setSolution(id){
+    this.solucionFijas = data.palabras_fijas[id];
+    soluciones = data.palabras_fijas[id];
+}
+
+function cargarDatosJuego(){
+    let ruta = "./data.json";
+    const json = require(ruta);
+    data = json;
+}
+
 /*function otorgarPista(letras){
 
 }*/
@@ -271,31 +214,32 @@ app.use((req, res, next) => {
     next();
 });
 
-// POST -> Datos del pasatiempo escogido
-app.post('/server.js', function(request, response){
+// POST -> Corregir Pasatiempo
+app.post('/check', function(request, response){
     const valores = request.body.valorCasillas;
     let vector = resolverTablero(valores);
     response.send(vector);
-    /*let data = return_specific_data(parametros);
-    response.send(data);*/
 });
 
+// POST -> Setear Datos Pasatiempo
 app.post('/data', function(request, response){
-    const valor = request.body.valor;
-    console.log(valor);
-    console.log("holaaaa");
-    response.send("holaaaaa");
+    let id = request.body.id;
+    let parametros = getBasicParameters(id);
+    setSolution(id);
+    response.send(parametros);
+    //NECESITO -> id del tablero
+    //devolver el tablero que se está usando
+    //devolver las coordenadas
+    //devolver las pistas
+    //devolver la info de las palabras fijas
+    //setear la solución con la que trabajar
+    //response.send("PARAMETROS TABLERO");
 });
 
-// POST -> Comprobación del tablero
-/*app.post('/server.js/data', function(request, response){
-    const received = request.body;
-    let vectorErrores = corregirTablero(received);
-    response.send(vectorErrores);
-});*/
 
-// POST -> Para dar las pistas
-/*app.post('/clues.js', function(request, response){
+//TODO, problemas del futuro
+// POST -> Otorgar pistas al navegador
+/*app.post('/clue', function(request, response){
     const received = request.body.vector;
     let arrayPistas = otorgarPista(received);
     response.send(arrayPistas);
@@ -303,6 +247,7 @@ app.post('/data', function(request, response){
 
 app.listen(port, () => {
     cargarDiccionario([4,6]);
+    cargarDatosJuego();
     console.log("Example app listening at "+`http://localhost:${port}`);
 });
 

@@ -10,27 +10,16 @@ var colores = {'verde':'#A7F270', 'rojo':'#E66852'};
 
 var tablero;
 var origen;
+var longitudes;
 
 function cargarDatosPasatiempo(){
-    this.tablero = [
-        [" "," "," "," "," "," "," "," "," "],
-        [" "," ","I","I","I","I","1"," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I"," "," "," "],
-        [" "," ","I","I","I","I","2"," "," "],
-        [" ","3","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" "," ","I","I","I","I","I","I"," "],
-        [" ","4","I","I","I","I","I","I"," "],
-        [" "," "," "," "," "," "," "," "," "]
-    ];
-    this.origen = [1,2];
-    $.post("http://localhost:8000/data", {valor:"jajajaja"}, function(result){
-        console.log(result);
+    let id_pasatiempo = "uno";
+    $.post("http://localhost:8000/data", {id: id_pasatiempo}, function(result){    
+        //console.log(result);
+        cargarPistas(result.infoPalabras);
+        setearValores(result);
+        setearTablero.then(crearTabla(), cargarInfoGuardada());
+        //metodo para setear el tablero, las pistas y el origen de coordenadas
     });
 }
 
@@ -228,7 +217,7 @@ function eliminarCaracter(palabra, car){
 
 function resolverPasatiempo(){
     console.log(this.valorCasillas);
-    $.post("http://localhost:8000/server.js", {valorCasillas: this.valorCasillas}, function(result){
+    $.post("http://localhost:8000/check", {valorCasillas: this.valorCasillas}, function(result){
         console.log('FIN COMPROBACIÓN');
         console.log(result);
         corregirTablero(result);
@@ -330,3 +319,25 @@ function createNumberColumn(num){
     columna.appendChild(texto);
     return columna;
 }
+
+function cargarPistas(pistas){
+    let pista;
+    for(const [key, value] of Object.entries(pistas)){
+        pista = document.getElementById("pista"+(key));
+        pista.innerHTML = value;
+    }
+}
+
+function setearValores(array){
+    tablero = array.tablero;
+    longitudes = array.longitudes;
+    origen = array.origen;
+}
+
+var setearTablero = new Promise(function(resolve, reject){
+    while(tablero == 'undefined'){
+
+    }
+    resolve();
+});
+    
