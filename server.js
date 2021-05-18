@@ -45,6 +45,11 @@ function almacenarPalabras(texto, sizes){
     });
     /*document.getElementById("botonResolver").disabled = false;
     document.getElementById("botonResolver").enabled = true;*/
+
+    //PALABRAS NO INCLUIDAS
+    arrayPalabrasDiccionario[5].push("coman");
+    arrayPalabrasDiccionario[5].push("toman");
+    arrayPalabrasDiccionario[5].push("manto");
     console.log('Palabras recogidas');
     console.log(arrayPalabrasDiccionario);
 }
@@ -67,13 +72,16 @@ function resolverTablero(data){
         });
         key = ""+(indice+1)+"";
         if(error){
+            //console.log("Entro porque hay error");
             if(key in soluciones) error = false;
             filasErroneas.push(indice);
         }else{
+            //console.log("No entro porque no hay error");
             if(!validarFila(palabra,indice,anterior)){
                 filasErroneas.push(indice);
                 error = true;
             }
+            //console.log(error);
         }
         anterior = palabra;
         palabra = "";
@@ -92,23 +100,36 @@ function validarFila(palabra, indice, anterior){
         if(existe(palabra)){
             resultado = validarCambio(palabra,anterior,indice)?true:false;
         }else{
+            //console.log("No existe");
             resultado = false;
         }
     }
-    if(resultado & (indice == 4 | indice == 10)){
+    /*if(resultado & (indice == 4 | indice == 10)){
         resultado = validarCambio(soluciones[indice+1],palabra,indice+1);
-    }
+    }*/
+    //console.log("palabra ->" + resultado);
     return resultado;
 }
 
 function existe(palabra){
-    if(palabra.length == longitudes[0]){
+    
+    let existe = false;
+    longitudes.forEach(function(elemento, index, _array){
+        //console.log("existe: " + palabra.length + "?= " +elemento);
+        if(palabra.length == elemento){
+            existe = arrayPalabrasDiccionario[elemento].includes(palabra);
+        }
+        //console.log("NOPE");
+    });
+    return existe;
+    
+    /*if(palabra.length == longitudes[0]){
         return arrayPalabrasDiccionario[longitudes[0]].includes(palabra);
     }else if(palabra.length == longitudes[1]){
         return arrayPalabrasDiccionario[longitudes[1]].includes(palabra);
     }else{
         return false;
-    }
+    }*/
 }
 
 function validarCambio(palabra, anterior, indice){
@@ -171,8 +192,8 @@ function getBasicParameters(id){
 }
 
 function setSolution(id){
-    this.solucionFijas = data.palabras_fijas[id];
     soluciones = data.palabras_fijas[id];
+    console.log(soluciones);
 }
 
 function cargarDatosJuego(){
@@ -226,6 +247,7 @@ app.post('/data', function(request, response){
     let id = request.body.id;
     let parametros = getBasicParameters(id);
     setSolution(id);
+    cargarDiccionario(longitudes);
     response.send(parametros);
     //NECESITO -> id del tablero
     //devolver el tablero que se está usando
@@ -246,7 +268,6 @@ app.post('/data', function(request, response){
 });*/
 
 app.listen(port, () => {
-    cargarDiccionario([4,6]);
     cargarDatosJuego();
     console.log("Example app listening at "+`http://localhost:${port}`);
 });

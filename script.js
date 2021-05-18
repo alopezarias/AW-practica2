@@ -1,5 +1,3 @@
-var arrayPalabras4 = [];
-var arrayPalabras6 = [];
 var casillas = [];
 var valorCasillas = [];
 var letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
@@ -76,6 +74,7 @@ function inicializarValorCasillas(){
         }
         if(fila.length != 0) valorCasillas.push(fila);
     }
+    console.log(valorCasillas);
 }
 
 /*FUNCIONES ENCARGADAS DEL GUARDADO DE INFORMACIÓN EN EL ALMACENAMIENTO */
@@ -147,7 +146,7 @@ function guardarValorCasillas(){
 
 /*FUNCIONES DE PISTAS DE PALABRAS*/
 
-function otorgarPista(){
+/*function otorgarPista(){
     if(pistas>0){
         var letras = document.getElementById("letrasPista").value.toLowerCase();
         //letras = letras.toLowerCase();
@@ -201,7 +200,7 @@ function actualizarPistas(){
         document.getElementById("botonPista").enabled = false;
         document.getElementById("botonPista").disabled = true;
     }
-}
+}*/
 
 function eliminarCaracter(palabra, car){
     let final = "";
@@ -274,6 +273,7 @@ function crearTabla(){
         tbody.appendChild(fila);
     }
     tabla.appendChild(tbody);
+    console.log(casillas);
 }
 
 function createEmptyColumn(){
@@ -320,13 +320,13 @@ function createNumberColumn(num){
     return columna;
 }
 
-function cargarPistas(pistas){
+/*function cargarPistas(pistas){
     let pista;
     for(const [key, value] of Object.entries(pistas)){
         pista = document.getElementById("pista"+(key));
         pista.innerHTML = value;
     }
-}
+}*/
 
 function setearValores(array){
     tablero = array.tablero;
@@ -335,9 +335,17 @@ function setearValores(array){
 }
 
 var setearTablero = new Promise(function(resolve, reject){
-    while(tablero == 'undefined'){
-
-    }
+    while(tablero == 'undefined'){}
     resolve();
 });
     
+function cargarPistas(pistas){
+    let lista = document.getElementById("informacion_palabras");
+    let pista;
+    for(const [key, value] of Object.entries(pistas)){
+        pista = document.createElement('li');
+        pista.setAttribute("id","pista"+key);
+        pista.innerHTML = value;
+        lista.appendChild(pista);
+    }
+}
