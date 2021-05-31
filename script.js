@@ -4,7 +4,8 @@ var letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 var guardarDatos = false;
 var pistas = 3;
 var infoPasatiempo = {'valores': '', 'pistas': ''};
-var colores = {'verde':'#A7F270', 'rojo':'#E66852'};
+var colores = {'verde':'#A7F270', 'rojo':'#E66852', 'azul':'#7ab6da'};
+var contador = 0;
 
 var tablero;
 var origen;
@@ -17,9 +18,11 @@ function eleccionPasatiempo(){
     elements[0] = document.getElementById("section");
     elements[1] = document.getElementById("barra");
     elements[2] = document.getElementById("section_eleccion");
+    elements[3] = document.getElementById("botonSolucion")
     elements[0].style.display = "none";
     elements[1].style.display = "none";
     elements[2].style.display = "block";
+    elements[3].style.display = "none";
 }
 
 function cargarDatosPasatiempo(id_pasatiempo){
@@ -32,9 +35,40 @@ function cargarDatosPasatiempo(id_pasatiempo){
         //console.log(result);
         cargarPistas(result.infoPalabras);
         setearValores(result);
-        setearTablero.then(crearTabla(), cargarInfoGuardada(id_pasatiempo));
+        setearTablero.then(crearTabla(),cargarInfoGuardada(id_pasatiempo));
         //metodo para setear el tablero, las pistas y el origen de coordenadas
     });
+    /*$.post("http://localhost:8000/diccionario", {parametro: "nulo"}, function(result){    
+        //poner la comprobacion de que el server ya ha cargado la info del diccionario
+        while(result!=true){}
+        document.getElementById("botonResolver").disabled = false;
+        document.getElementById("botonResolver").enabled = true;
+    });*/
+    setTimeout(() => {
+        document.getElementById("botonResolver").disabled = false;
+        document.getElementById("botonResolver").enabled = true;
+    }, 5000);
+    
+}
+
+function mostrarBotonSolucion(){
+    elements[3].style.display = "inline-block";
+}
+
+function mostrarSolucion(){
+    $.post("http://localhost:8000/solucion", {id: id}, function(result){    
+        rellenarTablero(result);
+    });
+}
+
+function rellenarTablero(soluciones){
+    let anteriores = valorCasillas;
+    cargarValoresCasillas(soluciones);
+    valorCasillas = anteriores;
+}
+
+function volverValoresAnteriores(){
+    cargarValoresCasillas(valorCasillas);
 }
 
 const removeAccents = (str) => {
@@ -62,9 +96,6 @@ function cargarInfoGuardada(id){
     } else {
         alert("Sorry, your browser does not support Web Storage...");
     }
-    //poner la comprobacion de que el server ya ha cargado la info del diccionario
-    document.getElementById("botonResolver").disabled = false;
-    document.getElementById("botonResolver").enabled = true;
 }
 
 function cargarValoresCasillas(valores){
@@ -205,19 +236,26 @@ function eliminarCaracter(palabra, car){
 /*FUNCIONES DE RESOLUCIÓN DEL TABLERO */
 
 function resolverPasatiempo(){
+    if(contador < 5){
+        contador++;
+    }else{
+        mostrarBotonSolucion();
+    }
     console.log(this.valorCasillas);
     $.post("http://localhost:8000/check", {valorCasillas: this.valorCasillas}, function(result){
         console.log('FIN COMPROBACIÓN');
         console.log(result);
-        corregirTablero(result);
+        corregirTablero(result.validas, result.correctas);
     });
 }
 
-function corregirTablero(filasErroneas){
+function corregirTablero(filasValidas, filasCorrectas){
     casillas.forEach(function(elemento, indice, _array){
-        var funcion = pintarVerde;
-        if(filasErroneas.includes(indice))
-            funcion = pintarRojo;
+        var funcion = pintarRojo;
+        if(filasValidas!=null && filasValidas.includes(indice))
+            funcion = pintarVerde;
+        else if(filasCorrectas!=null && filasCorrectas.includes(indice))
+            funcion = pintarAzul;
         elemento.forEach(function(elemento, _indice, _array){
             funcion(elemento);
         });
@@ -232,10 +270,21 @@ function pintarRojo(elemento){
     elemento.style.backgroundColor=colores.rojo;
 }
 
+function pintarAzul(elemento){
+    elemento.style.backgroundColor=colores.azul;
+}
+
 /*FUNCIONES DE LA CREACIÓN DEL TABLERO DE JUEGO DEL PASATIEMPO*/
 function crearTabla(){
     let tabla = document.getElementById("tabla");
     let tbody = document.createElement("tbody");
+
+    let header = document.createElement("th");
+    let h2 = document.createElement("h2");
+    h2.innerHTML = "TABLERO DEL PASATIEMPO";
+    header.appendChild(h2);
+    header.setAttribute("colspan",9);
+    tbody.appendChild(header);
     
     for(let i=0; i<tablero.length; i++){
         let fila = document.createElement("tr");
@@ -262,6 +311,7 @@ function crearTabla(){
         refFila = [];
         tbody.appendChild(fila);
     }
+    tbody.setAttribute("id","tbody_tablero");
     tabla.appendChild(tbody);
     console.log(casillas);
 }
@@ -295,6 +345,50 @@ function createInputCell(id, indices){
     celda.setAttribute("maxlength","1");
     celda.setAttribute("onblur","guardarCasilla("+indices+")");
     return celda;
+}
+
+function cargarLeyenda(){
+    let tabla = document.getElementById("tabla_leyenda");
+    let tbleyenda = document.createElement("tbody");
+
+    let header = document.createElement("th");
+    let h2 = document.createElement("h4");
+    h2.innerHTML = "LEYENDA DEL TABLERO";
+    header.appendChild(h2);
+    header.setAttribute("colspan",2);
+    tbleyenda.appendChild(header);
+    
+    let colores = ['#A7F270','#E66852','#7ab6da'];
+    let leyendas = ['Palabra válida','Palabra errónea','Palabra correcta'];
+
+    for(let i=0; i<3; i++){
+        let fila = document.createElement("tr");
+        let col0 = createLeyendaColumn(colores[i])
+        let col1 = document.createElement("td");
+        col1.innerHTML = leyendas[i];
+        fila.appendChild(col0);
+        fila.appendChild(col1);
+        tbleyenda.appendChild(fila);
+    }
+
+    tbleyenda.setAttribute("id","tbody_leyenda");
+    tabla.appendChild(tbleyenda);
+}
+
+function createLeyendaColumn(color){
+    let celda = document.createElement("input");
+    celda.setAttribute("class","celda");
+    celda.setAttribute("type","text");
+    celda.setAttribute("size","1");
+    celda.setAttribute("maxlength","1");
+    celda.setAttribute("readonly","true");
+    celda.setAttribute("focusable","false");
+    celda.style.backgroundColor=color;
+    let columna = document.createElement("td");
+    columna.setAttribute("class","columna_input");
+    columna.setAttribute("colspan","1");
+    columna.appendChild(celda);
+    return columna;
 }
 
 function createNumberColumn(num){

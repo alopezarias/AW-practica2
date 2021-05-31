@@ -102,5 +102,49 @@
             "5": "Muchos papas.",
             "6": "Alimento líquido que no gusta a los niños (plural)."
         }
+    },
+    "soluciones_completas": {
+        "uno" : {
+            "0": "CLAN",
+            "1": "CIAN",
+            "2": "NACI",
+            "3": "NACE",
+            "4": "CENA",
+            "5": "PENA",
+            "6": "REMATO",
+            "7": "REMOTO",
+            "8": "MOTERO",
+            "9": "LOTERO",
+            "10": "TOLERO",
+            "11": "TORERO"
+        },
+        "dos" : {
+            "0": "MANGO",
+            "1": "MANCO",
+            "2": "COMAN",
+            "3": "TOMAN",
+            "4": "MANTO",
+            "5": "CANTO",
+            "6": "SOL",
+            "7": "SAL",
+            "8": "LAS",
+            "9": "LOS",
+            "10": "SOL",
+            "11": "SAL"
+        },
+        "tres" : {
+            "0": "TEZ",
+            "1": "TEN",
+            "2": "NET",
+            "3": "PASA",
+            "4": "PATA",
+            "5": "TAPA",
+            "6": "CAPA",
+            "7": "PACOS",
+            "8": "POCOS",
+            "9": "COPOS",
+            "10": "COPAS",
+            "11": "SOPAS"
+        }
     }
 }

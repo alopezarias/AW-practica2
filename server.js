@@ -6,6 +6,8 @@
 var data;
 var arrayPalabrasDiccionario = {};
 var tablero, longitudes, soluciones, origen;
+var soluciones_completas;
+//var diccionario = false;
 
 //#######################################################################//
 //#######################################################################//
@@ -50,8 +52,12 @@ function almacenarPalabras(texto, sizes){
     arrayPalabrasDiccionario[5].push("coman");
     arrayPalabrasDiccionario[5].push("toman");
     arrayPalabrasDiccionario[5].push("manto");
+    arrayPalabrasDiccionario[5].push("copos");
+    arrayPalabrasDiccionario[5].push("copas");
+    arrayPalabrasDiccionario[5].push("pocos");
     console.log('Palabras recogidas');
     console.log(arrayPalabrasDiccionario);
+    //diccionario = true;
 }
 
 /*function return_specific_data(number){
@@ -59,10 +65,10 @@ function almacenarPalabras(texto, sizes){
 }*/
 
 function resolverTablero(data){
-
     let palabra = "";
     let anterior = null;
-    filasErroneas = [];
+    let filasCorrectas = [];
+    let filasValidas = [];
     var error = false;
     let key;
 
@@ -73,20 +79,30 @@ function resolverTablero(data){
         key = ""+(indice+1)+"";
         if(error){
             //console.log("Entro porque hay error");
+            console.log(palabra +" - es erronea");
             if(key in soluciones) error = false;
-            filasErroneas.push(indice);
+            //filasErroneas.push(indice);
         }else{
             //console.log("No entro porque no hay error");
-            if(!validarFila(palabra,indice,anterior)){
-                filasErroneas.push(indice);
+            if(palabra.length>0 && validarFila(palabra,indice,anterior)){
+                filasCorrectas.push(indice);
+                //console.log(palabra +" - es correcta");
+            }else if(palabra.length>0 && existe(palabra)){
+                filasValidas.push(indice);
+                //console.log(palabra +" - es valida");
+            }else{
                 error = true;
+                //console.log(palabra +" - es erronea");
             }
             //console.log(error);
         }
         anterior = palabra;
         palabra = "";
     });
-    return filasErroneas;
+    let filas = {};
+    filas['validas'] = filasValidas;
+    filas['correctas'] = filasCorrectas;
+    return filas;
 }
 
 function validarFila(palabra, indice, anterior){
@@ -112,16 +128,26 @@ function validarFila(palabra, indice, anterior){
 }
 
 function existe(palabra){
-    
-    let existe = false;
-    longitudes.forEach(function(elemento, index, _array){
-        //console.log("existe: " + palabra.length + "?= " +elemento);
+    palabra = palabra.toLowerCase();
+    //let existe = false;
+
+    /*console.log(palabra);
+    console.log(palabra.length);
+    console.log("buscando en: ");
+    console.log(arrayPalabrasDiccionario[palabra.length]);
+    console.log(arrayPalabrasDiccionario[palabra.length].includes(palabra))*/
+
+    return arrayPalabrasDiccionario[palabra.length].includes(palabra);
+
+    /*longitudes.forEach(function(elemento, index, _array){
+        console.log(palabra + " existe: " + palabra.length + "?= " +elemento);
         if(palabra.length == elemento){
             existe = arrayPalabrasDiccionario[elemento].includes(palabra);
         }
-        //console.log("NOPE");
-    });
-    return existe;
+        console.log(existe);
+        
+    });*/
+    //return existe;
     
     /*if(palabra.length == longitudes[0]){
         return arrayPalabrasDiccionario[longitudes[0]].includes(palabra);
@@ -136,7 +162,8 @@ function validarCambio(palabra, anterior, indice){
     anterior = anterior.toLowerCase();
     var longitud = palabra.length;
     let palabraMod, todasLetras, ant, numCoincidencias = 0;
-    if(indice%2==1){ //cambio letra
+    let lastSol = getLastSol(indice);
+    if((indice-lastSol)%2==1){ //cambio letra
         for(var i=0; i<longitud; i++){
             ant = anterior;
             palabraMod = eliminarCaracter(palabra, palabra.charAt(i));
@@ -175,6 +202,14 @@ function eliminarCaracter(palabra, car){
     return final;
 }
 
+function getLastSol(indice){
+    let indiceSolucion = indice-1;
+    while(!soluciones.hasOwnProperty(indiceSolucion)){
+        indiceSolucion--;
+    }
+    return indiceSolucion;
+}
+
 function getBasicParameters(id){
     let parametros = {'tablero': '',
                       'origen': '',
@@ -193,6 +228,7 @@ function getBasicParameters(id){
 
 function setSolution(id){
     soluciones = data.palabras_fijas[id];
+    soluciones_completas = data.soluciones_completas[id];
     console.log(soluciones);
 }
 
@@ -261,8 +297,11 @@ app.use((req, res, next) => {
 // POST -> Corregir Pasatiempo
 app.post('/check', function(request, response){
     const valores = request.body.valorCasillas;
-    let vector = resolverTablero(valores);
-    response.send(vector);
+    let data = resolverTablero(valores);
+    /*let data = [];
+    data.push(validas);
+    data.push(correctas);*/
+    response.send(data);
 });
 
 // POST -> Setear Datos Pasatiempo
@@ -281,6 +320,11 @@ app.post('/data', function(request, response){
     //response.send("PARAMETROS TABLERO");
 });
 
+// POST -> Cargar diccionario
+app.post('/solucion', function(request, response){
+    response.send(soluciones_completas);
+});
+
 
 //TODO
 // POST -> Otorgar pistas al navegador
@@ -292,6 +336,6 @@ app.post('/clue', function(request, response){
 
 app.listen(port, () => {
     cargarDatosJuego();
-    console.log("Example app listening at "+`http://localhost:${port}`);
+    console.log("Server listening at "+`http://localhost:${port}`);
 });
 

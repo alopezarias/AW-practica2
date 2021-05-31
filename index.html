@@ -8,30 +8,29 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
 
-    <body class="pagina" onload="eleccionPasatiempo()">
-        <header class="color1">
+    <body class="pagina" onload="eleccionPasatiempo(), cargarLeyenda();">
+        <header>
             <h1 class="titulo">EN CASCADA</h1>
         </header>
-        <nav id="barra" class="color1">
+        <nav id="barra">
+            <button id="botonSolucion" type="button" onmousedown="mostrarSolucion()" onmouseup="volverValoresAnteriores()">Pulsa aquí para ver la solución</button>
             <button id="botonResolver" type="button" onclick="resolverPasatiempo()" disabled>Resolver</button>
         </nav>
         <section id="section_eleccion">
-            <article id="pasatiempos" class="color2">
+            <article id="pasatiempos">
                 <button class="pasatiempo" type="button" onclick="cargarDatosPasatiempo('uno')">INICIAL</button>
                 <button class="pasatiempo" type="button" onclick="cargarDatosPasatiempo('dos')">MEDIO</button>
                 <button class="pasatiempo" type="button" onclick="cargarDatosPasatiempo('tres')">EXPERTO</button>       
             </article>
         </section>
         <section id="section">
-            <article id="tablero" class="color2">
-                <form>
-                    <table id="tabla">
-                        <th colspan="9">Tablero del Pasatiempo</th>
-                    </table>
+            <article id="tablero">
+                <form id="formulario_tablero">
+                    <table id="tabla"></table>
                 </form>
             </article>
-            <article id="instrucciones" class="color3">
-                <article id="datos" class="color4">
+            <article id="instrucciones">
+                <article id="datos">
                     <h4>Información de resolución</h4>
                     <ol id="informacion_palabras"></ol>
                     <h4>Instrucciones del pasatiempo</h4>
@@ -43,7 +42,7 @@
                         tener significado.
                     </p>
                 </article>
-                <article id="seccionPista" class="color5">
+                <article id="seccionPista">
                     <form>
                         <table id="tablaPista">
                             <tr>
@@ -67,9 +66,14 @@
                         </table>
                     </form>
                 </article>
+                <article id="leyenda">
+                    <form>
+                        <table id="tabla_leyenda"> </table>
+                    </form>
+                </article>
             </article>
         </section>
-        <footer class="color6">
+        <footer>
             <table class="tabla_toggle">
                 <tr>
                     <td>
